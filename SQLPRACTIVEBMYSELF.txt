@@ -1,0 +1,151 @@
+1หาพนักงานที่มีเงินเดือนมากกว่า 70000
+SELECT *
+FROM stu65160091.employees 
+JOIN salaries ON emp_id = sal_employee_id
+WHERE sal_salary > 70000
+  AND sal_to_date = (
+    SELECT MAX(sal_to_date)
+    FROM salaries
+    WHERE sal_employee_id = emp_id
+);
+
+2ค้นหารายละเอียดพนักงานที่ทำงานในDepartment "HR" และมีเงินเดือนมากกว่า 50,000
+SELECT  employees.*,dept_name,sal_to_date,sal_salary
+FROM employees 
+JOIN salaries ON emp_id = sal_employee_id
+join department_employee on emp_id = deem_employee_id
+join departments on deem_department_id = dept_id
+WHERE sal_salary > 70000
+  AND sal_to_date = (
+    SELECT MAX(sal_to_date)
+    FROM salaries
+    WHERE sal_employee_id = emp_id and dept_name = "Human Resources"
+);
+
+
+3ค้นหาพนักงานที่ทำงานในแผนก "Dev" และมีบทบาทเป็น "Manager"
+SELECT  emp_id,dept_name,ro_name
+FROM employees 
+join department_employee on emp_id = deem_employee_id
+join departments on deem_department_id = dept_id
+JOIN roles ON deem_role_id = ro_id
+where dept_name = "Development" and ro_name = 'Manager';
+
+
+4ค้นหาพนักงานที่ได้รับเงินเดือนล่าสุดน้อยที่สุด
+SELECT employees.*,sal_salary,sal_to_date
+FROM employees 
+JOIN salaries ON emp_id = sal_employee_id
+WHERE sal_to_date = (
+    SELECT MAX(sal_to_date)
+    FROM salaries
+    WHERE sal_employee_id = emp_id
+) and sal_salary = (
+	select min(sal_salary)
+    FROM salaries
+    WHERE sal_employee_id = emp_id
+)
+order by sal_salary asc
+limit 10
+5ค้นหาพนักงานที่ได้รับเงินเดือนสูงสุดในแต่ละแผนก
+SELECT 
+    departments.dept_name, 
+    employees.emp_fname, 
+    employees.emp_lname, 
+    MAX(salaries.sal_salary) AS max_salary
+FROM 
+    departments 
+JOIN 
+    department_employee ON departments.dept_id = department_employee.deem_department_id 
+JOIN 
+    employees ON department_employee.deem_employee_id = employees.emp_id 
+JOIN 
+    salaries ON employees.emp_id = salaries.sal_employee_id
+WHERE 
+    salaries.sal_to_date > CURRENT_DATE 
+GROUP BY 
+    departments.dept_id
+ORDER BY 
+    max_salary ASC;6.หาจำนวนพนักงานในแต่ละแผนก
+6.หาจำนวนพนักงานในแต่ละแผนก
+SELECT 
+    dept_name, 
+    COUNT(emp_id) AS employee_count
+FROM 
+    departments
+JOIN 
+    department_employee ON dept_id = deem_department_id
+JOIN 
+    employees ON deem_employee_id = emp_id
+GROUP BY 
+    dept_id;
+
+
+7หาผลรวมเงินเดือนปัจจุบันของแต่ละแผนก
+SELECT 
+    departments.dept_name, 
+    SUM(salaries.sal_salary) AS total_salary
+FROM 
+    departments
+JOIN 
+    department_employee ON departments.dept_id = department_employee.deem_department_id
+JOIN 
+    employees ON department_employee.deem_employee_id = employees.emp_id
+JOIN 
+    salaries ON employees.emp_id = salaries.sal_employee_id
+WHERE 
+    salaries.sal_to_date > CURRENT_DATE
+GROUP BY 
+    departments.dept_id;
+
+8manager ผู้ชาย แต่ละแผนกที่มีเงินเดือนสูงสุด
+ 
+
+9แสดงพนักงานและแผนกที่เข้ามาใน 30 ปี และมีเงินเดือนสูงสุด 10 คน
+ 
+10เพิ่มพนักงาน Joe Dohn เพศ ชาย ตำแหน่ง Manager แผนก Development และมีเงินเดือนเริ่มต้น 100,000
+
+11 หาพนักงานที่มีชื่อหน้า เริ่มต้นด้วยตัว J และอยู่แผนก Development
+SELECT 
+    e.emp_fname, 
+    e.emp_lname, 
+    d.dept_name
+
+FROM 
+    employees e
+JOIN 
+    department_employee de ON de.deem_employee_id = e.emp_id
+JOIN 
+    departments d ON d.dept_id = de.deem_department_id
+JOIN 
+    salaries s ON s.sal_employee_id = e.emp_id
+JOIN 
+    emp_title et ON et.emti_employee_id = e.emp_id
+JOIN 
+    titles t ON t.tit_id = et.emti_title_id
+WHERE 
+    e.emp_fname LIKE 'J%' -- Filter for first names starting with 'J'
+    AND d.dept_name = 'Development' -- Ensure employee is in the Development department
+
+GROUP BY emp_fname
+
+12  หาพนักงานที่มีนามสกุล ลงท้ายด้วยตัว E และมีเข้ามาอยู่ในแผนก ปี 1990 - 2000
+
+SELECT 
+    e.emp_fname, 
+    e.emp_lname, 
+    d.dept_name, 
+    et.emti_from_date
+FROM 
+    employees e
+JOIN 
+    department_employee de ON de.deem_employee_id = e.emp_id
+JOIN 
+    departments d ON d.dept_id = de.deem_department_id
+JOIN 
+    emp_title et ON et.emti_employee_id = e.emp_id
+WHERE 
+    e.emp_lname LIKE '%E' -- Last names ending with 'E'
+    AND YEAR(et.emti_from_date) BETWEEN 1990 AND 2000 -- Joined between 1990 and 2000
+ORDER BY 
+    et.emti_from_date ASC; -- Optional: order by the date they joined

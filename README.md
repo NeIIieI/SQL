@@ -204,6 +204,40 @@ FROM
     mock_reg_db.user_students
 JOIN 
     mock_reg_db.courses_enrolled ON mock_reg_db.user_students.usst_id = mock_reg_db.courses_enrolled.ce_usst_id
+
+
+
+โจทย์ข้อที่ 1: เพิ่มข้อมูลใน student_insert_test
+คำอธิบาย: เพิ่มข้อมูลของตนเองลงในตาราง student_insert_test
+
+ลักษณะข้อมูลที่ได้
+insert into student_insert_test (tin_fname,tin_lname,tin_team,tin_created_at) values ('boat','banana','7',now())
+
+โจทย์ข้อที่ 2: อัปเดตข้อมูลของตนเองใน student_update_test
+คำอธิบาย: อัปเดตข้อมูลที่อยู่ของตนเองในตาราง student_update_test
+
+update stu65160334_mock_reg_db.student_update_test 
+set student_update_test.tup_fname = 'ธนวันต์ UPDATE', student_update_test.tup_lname = 'สุดUPDATE' , student_update_test.tup_updated_at = now()
+where stu65160334_mock_reg_db.student_update_test.tup_id = 85
+
+โจทย์ข้อที่ 3: รวมชื่อและนามสกุลเป็น Name
+คำอธิบาย: รวมชื่อและนามสกุลของนักศึกษาเป็นคอลัมน์เดียวชื่อว่า name
+
+select  concat(student_update_test.tup_fname ,' ', student_update_test.tup_lname) as namefull
+from stu65160334_mock_reg_db.student_update_test
+
+โจทย์ข้อที่ 4: จำนวนอำเภอและตำบลในแต่ละจังหวัด
+คำอธิบาย: หาจำนวนอำเภอและตำบลในแต่ละจังหวัด โดยแสดงชื่อจังหวัด จำนวนอำเภอ และจำนวนตำบล
+
+select mock_thailand_db.provinces.pv_name_th , count(distinct mock_thailand_db.districts.dt_id) , count(distinct mock_thailand_db.sub_districts.sdt_id)
+from mock_thailand_db.provinces
+join mock_thailand_db.districts on pv_id = dt_pv_id
+join mock_thailand_db.sub_districts on dt_id = sdt_dt_id
+group by pv_id
+
+
+
+
 GROUP BY 
     mock_reg_db.user_students.usst_id
 HAVING 
